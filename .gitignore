@@ -8,6 +8,18 @@ __pycache__/
 .tmp/
 .librarian/
 
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+report.json
+acceptance_tests/*.png
+
 
 #intellij
 *.iml
