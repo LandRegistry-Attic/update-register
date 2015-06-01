@@ -56,27 +56,48 @@ def index():
 
 #curl -X POST -d '{"a":"1"}' -H "Content-Type: application/json" http://localhost:5003/titles/dn100/groups/1/entries/1
 # amend an individual entry
-@app.route('/titles/<title_number>/groups/<int:group_number>/entries/<int:entry_number>', methods=["POST"])
-def amend_an_entry(title_number, group_number, entry_number):
+@app.route('/titles/<title_number>/groups/<int:group_position>/entries/<int:entry_position>', methods=["POST"])
+def amend_an_entry(title_number, group_position, entry_position):
+
+    title_json = get_title_from_working_register(title_number)
+
+    # change the title according to the posted entry update
+
+    #WRITES THE ENTRY AS UNICODE ATM.
+
+    new_entry = request.get_json()
+
+    title_json["groups"][group_position]["entries"][entry_position] = new_entry
+
+    update_title_on_working_register(title_json)
+
     return 'wip amend', 200
 
 
 # insert a new entry
-@app.route('/titles/<title_number>/groups/<int:group_number>/entries/<int:entry_number>', methods=["PUT"])
-def add_an_entry(title_number, group_number, entry_number):
+@app.route('/titles/<title_number>/groups/<int:group_position>/entries/<int:entry_position>', methods=["PUT"])
+def add_an_entry(title_number, group_position, entry_position):
     return 'wip insert', 201
 
 
 # delete an entry
-@app.route('/titles/<title_number>/groups/<int:group_number>/entries/<int:entry_number>', methods=["DELETE"])
-def delete_an_entry(title_number, group_number, entry_number):
+@app.route('/titles/<title_number>/groups/<int:group_position>/entries/<int:entry_position>', methods=["DELETE"])
+def delete_an_entry(title_number, group_position, entry_position):
     return 'wip delete', 200
 
 
 # amend a group of entries
-@app.route('/titles/<title_number>/groups/<int:group_number>/entries/', methods=["POST"])
-def amend_entry_group(title_number, group_number):
+@app.route('/titles/<title_number>/groups/<int:group_position>/entries/', methods=["POST"])
+def amend_entry_group(title_number, group_position):
     return 'wip group amend', 200
 
 
+#gets the title from the working register.
+def get_title_from_working_register(title_number):
+    return SUBJECT
 
+
+#Updates the register with the amendment
+def update_title_on_working_register(title_json):
+    app.logger.info(title_json)
+    return 'updated'
