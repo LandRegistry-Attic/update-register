@@ -1,5 +1,6 @@
 from application import app
 import json
+import yaml
 from flask import request
 
 SUBJECT = {
@@ -41,42 +42,92 @@ def index():
     return 'update-register running'
 
 
-# @app.route('/entry', methods=["GET", "POST", "PUT", "DELETE"])
-# def amend_entry():
-#     if request.method == 'GET':
-#         return 'get called on entry route'
-#
-#     if request.method == 'POST':
-#
-#         entry_group_id = request.get_json()["group_id"]
-#         entry_category = request.get_json()["category"]
-#
-#         return json.dumps(get_title('ff'))
-
-
-#curl -X POST -d '{"a":"1"}' -H "Content-Type: application/json" http://localhost:5003/titles/dn100/groups/1/entries/1
 # amend an individual entry
-@app.route('/titles/<title_number>/groups/<int:group_number>/entries/<int:entry_number>', methods=["POST"])
-def amend_an_entry(title_number, group_number, entry_number):
-    return 'wip amend', 200
+@app.route('/titles/<title_number>/groups/<int:group_position>/entries/<int:entry_position>', methods=["POST"])
+def amend_an_entry(title_number, group_position, entry_position):
+    title_json = get_title_from_working_register(title_number)
+
+    # Amend title_json with the payload (an entry).  Use PyYAML to convert payload from unicode to ASCII.
+    new_entry_string = json.dumps(request.get_json())
+    new_entry_dict = yaml.safe_load(new_entry_string)
+    title_json["groups"][group_position]["entries"][entry_position] = new_entry_dict
+
+    update_title_on_working_register(title_json)
+    return 'amendment made at group position %i, entry position %i' % (group_position, entry_position), 200
 
 
 # insert a new entry
-@app.route('/titles/<title_number>/groups/<int:group_number>/entries/<int:entry_number>', methods=["PUT"])
-def add_an_entry(title_number, group_number, entry_number):
-    return 'wip insert', 201
+@app.route('/titles/<title_number>/groups/<int:group_position>/entries', methods=["PUT"])
+def insert_entry(title_number, group_position):
+    title_json = get_title_from_working_register(title_number)
+
+    # Insert to title_json with the payload (an entry).  Use PyYAML to convert payload from unicode to ASCII.
+    new_entry_string = json.dumps(request.get_json())
+    new_entry_dict = yaml.safe_load(new_entry_string)
+    title_json["groups"][group_position]["entries"].append(new_entry_dict)
+    entry_position = len(title_json["groups"][group_position]["entries"]) - 1
+
+    update_title_on_working_register(title_json)
+    return 'Insert made at group position %i, entry position %i' % (group_position, entry_position), 201
 
 
 # delete an entry
-@app.route('/titles/<title_number>/groups/<int:group_number>/entries/<int:entry_number>', methods=["DELETE"])
-def delete_an_entry(title_number, group_number, entry_number):
-    return 'wip delete', 200
+@app.route('/titles/<title_number>/groups/<int:group_position>/entries/<int:entry_position>', methods=["DELETE"])
+def delete_entry(title_number, group_position, entry_position):
+    title_json = get_title_from_working_register(title_number)
+
+    title_json["groups"][group_position]["entries"].pop(entry_position)
+
+    update_title_on_working_register(title_json)
+    return 'Delete at group position %i, entry position %i' % (group_position, entry_position), 200
 
 
-# amend a group of entries
-@app.route('/titles/<title_number>/groups/<int:group_number>/entries/', methods=["POST"])
-def amend_entry_group(title_number, group_number):
-    return 'wip group amend', 200
+# insert a group
+@app.route('/titles/<title_number>/groups', methods=["PUT"])
+def insert_group(title_number):
+    title_json = get_title_from_working_register(title_number)
+
+    # Insert to title_json with the payload (a group).  Use PyYAML to convert payload from unicode to ASCII.
+    new_group_string = json.dumps(request.get_json())
+    new_group_dict = yaml.safe_load(new_group_string)
+    title_json["groups"].append(new_group_dict)
+    group_position = len(title_json["groups"]) - 1
+
+    update_title_on_working_register(title_json)
+    return 'Insert made at group position %i' % group_position, 201
 
 
+# delete a group
+@app.route('/titles/<title_number>/groups/<int:group_position>', methods=["DELETE"])
+def delete_a_group(title_number, group_position):
+    title_json = get_title_from_working_register(title_number)
 
+    title_json["groups"].pop(group_position)
+
+    update_title_on_working_register(title_json)
+    return 'Delete at group position %i' % group_position, 200
+
+
+# Amend a group
+@app.route('/titles/<title_number>/groups/<int:group_position>', methods=["POST"])
+def amend_group(title_number, group_position):
+    title_json = get_title_from_working_register(title_number)
+
+    # Amend title_json with the payload (entries).  Use PyYAML to convert payload from unicode to ASCII.
+    new_group_string = json.dumps(request.get_json())
+    new_group_dict = yaml.safe_load(new_group_string)
+    title_json["groups"][group_position] = new_group_dict
+
+    update_title_on_working_register(title_json)
+    return 'Group amended at group position %i' % group_position, 200
+
+
+#gets the title from the working register.
+def get_title_from_working_register(title_number):
+    return SUBJECT
+
+
+#Updates the register with the amendment
+def update_title_on_working_register(title_json):
+    app.logger.info(title_json)
+    return 'updated'
