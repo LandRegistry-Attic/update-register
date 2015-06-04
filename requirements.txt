@@ -1,7 +1,8 @@
-flask
+Flask==0.10.1
 Werkzeug
-Jinja2
-itsdangerous
-markupsafe
-requests
-gunicorn
+Jinja2==2.7.3
+itsdangerous==0.24
+MarkupSafe==0.23
+requests==2.7.0
+gunicorn==19.3.0
+PyYAML==3.11
