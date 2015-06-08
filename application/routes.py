@@ -1,4 +1,6 @@
+from application.models import WorkingTitles
 from application import app
+from application import db
 import json
 import yaml
 from flask import request
@@ -35,7 +37,6 @@ SUBJECT = {
         }
     ]
 }
-
 
 @app.route('/health')
 def index():

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source ./environment.shcd deve  
+source ./environment.sh
 
 python run.py
 

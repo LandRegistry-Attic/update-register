@@ -16,6 +16,23 @@ This will work in the devenv-casework environment is the following is added to t
     entrypoint: application:app
     vars:
 ```
+
+##Migrate tables
+From with the virtual machine you need to Export the environment variable to connect
+to the database.
+
+```
+export SQLALCHEMY_DATABASE_URI="postgresql://workingregister:workingregister@localhost/workingregister"
+```
+
+Then run the command to upgrade the tables
+
+```
+python manage.py db upgrade
+```
+
+Ideally this would be scripted as part of the vagrant up (find a way to add to lr-setup-apps)
+
 ##Curls
 
 ###Amend an entry
@@ -57,3 +74,5 @@ install requirements_test.txt and run
 ```
 source test.sh
 ```
+
+
