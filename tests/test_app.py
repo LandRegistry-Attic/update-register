@@ -3,11 +3,10 @@ import json
 import mock
 
 from application import app
+from application.routes import get_title
 from test_data import TITLE_WITH_AMENDED_ENTRY, ENTRY_AMENDMENT, ENTRY_INSERT, TITLE_WITH_INSERTED_ENTRY
 from test_data import TITLE_WITH_DELETED_ENTRY, get_target_json, GROUP_INSERT, TITLE_WITH_DELETED_GROUP
 from test_data import TITLE_WITH_INSERTED_EMPTY_GROUP, TITLE_WITH_REPLACED_GROUP, GROUP_REPLACE
-from application.routes import amend_an_entry
-
 
 class TestCaseListView(unittest.TestCase):
 
@@ -130,10 +129,22 @@ class TestCaseListView(unittest.TestCase):
     #     response = self.app.post('/titles/dn100/groups/99', data=GROUP_REPLACE, headers=headers)
     #     assert response.status_code == 500
 
+    @mock.patch('application.routes.write_to_working_titles_database')
+    def test_started(self, mock_write):
+        mock_write.side_effect = self.do_nothing
+        title_application_data = '{"application_reference": "testabr", "title_number": "tt12345"}'
+        headers = {'content-Type': 'application/json'}
+        response = self.app.post('/start', data=title_application_data, headers=headers)
+        assert response.status_code == 201
+        self.assertEqual('started title number tt12345 application reference testabr', response.data.decode("utf-8"))
+
     def mock_update_title_on_working_register(self, title_json):
         self.mock_title = title_json
         return 'updated'
 
     def mock_get_title_from_working_register(self, title_number):
         return get_target_json()
+
+    def do_nothing(self, *args):
+        pass
 

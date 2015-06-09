@@ -5,42 +5,65 @@ import json
 import yaml
 from flask import request
 
-SUBJECT = {
-    "groups": [
-        {
-            "group_id": "1",
-            "category": "ABCD",
-            "entries": [
-                {
-                    "entry_id": "998",
-                    "full_text": "foo"
-                },
-                {
-                    "entry_id": "999",
-                    "full_text": "bar"
-                }
-            ]
-        },
-        {
-            "group_id": "2",
-            "category": "EFGH",
-            "entries": [
-                {
-                    "entry_id": "999",
-                    "full_text": "cat"
-                },
-                {
-                    "entry_id": "998",
-                    "full_text": "mat"
-                }
-            ]
-        }
-    ]
-}
+
+def get_title():
+    return {
+        "description": "test data",
+        "application_reference": "testabr",
+        "title_number": "tt12345",
+        "dlr": "a dlr",
+        "groups": [
+            {
+                "group_id": "1",
+                "category": "ABCD",
+                "entries": [
+                    {
+                        "entry_id": "998",
+                        "full_text": "foo"
+                    },
+                    {
+                        "entry_id": "999",
+                        "full_text": "bar"
+                    }
+                ]
+            },
+            {
+                "group_id": "2",
+                "category": "EFGH",
+                "entries": [
+                    {
+                        "entry_id": "999",
+                        "full_text": "cat"
+                    },
+                    {
+                        "entry_id": "998",
+                        "full_text": "mat"
+                    }
+                ]
+            }
+        ]
+    }
+
 
 @app.route('/health')
 def index():
     return 'update-register running'
+
+# This will start a new version of the register for amendment.  Right now it just adds test data to
+# the working register database
+@app.route('/start', methods=["POST"])
+def start():
+    payload = request.get_json()
+    title_number = payload["title_number"]
+    application_reference = payload["application_reference"]
+
+    title_json = get_title()  # get data as hardcoded string for now
+    title_json["title_number"] = title_number  # re-assign payloads title number and abr
+    title_json["application_reference"] = application_reference
+
+
+    write_to_working_titles_database(title_json)
+    return 'started title number %s application reference %s' % (title_number, application_reference), 201
 
 
 # amend an individual entry
@@ -125,10 +148,28 @@ def amend_group(title_number, group_position):
 
 #gets the title from the working register.
 def get_title_from_working_register(title_number):
-    return SUBJECT
+    # Gets the version of title number with the latest ID on the table
+    title = None
+    sql_text = "SELECT * FROM records WHERE record ->> 'title_number' = '%s' order by id desc limit 1;" % title_number
+    result = db.engine.execute(sql_text)
+    for row in result:
+        title = row['record']
+    return title
 
 
 #Updates the register with the amendment
 def update_title_on_working_register(title_json):
     app.logger.info(title_json)
+    write_to_working_titles_database(title_json)
     return 'updated'
+
+
+def write_to_working_titles_database(title_json):
+    working_titles_object = WorkingTitles(title_json)
+    try:
+        db.session.add(working_titles_object)
+        db.session.flush()
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
