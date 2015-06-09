@@ -65,6 +65,11 @@ curl -X DELETE http://localhost:5003/titles/dn100/groups/0
 curl -X POST -d '{"group_id":"76","category":"ZVCF","entries":[{"entry_id":"498","full_text":"fly"},{"entry_id":"233","full_text":"bug"}]}' -H "Content-Type: application/json" http://localhost:5003/titles/dn100/groups/1
 ```
 
+###Start a new version of a title (work in progress).  Creates test data at the moment.
+
+```
+curl -X POST -d '{"application_reference": "testabr", "title_number": "tt12345"}' -H "Content-Type: application/json" http://localhost:5003/start
+```
 
 
 ##Tests
