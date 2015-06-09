@@ -53,6 +53,13 @@ curl -X PUT -d '{"entry_id": "998","full_text": "dog"}' -H "Content-Type: applic
 curl -X DELETE http://localhost:5003/titles/dn100/groups/1/entries/0
 ```
 
+###Insert a group
+
+```
+curl -X PUT -d '{"group_id":"76","category":"ZVCF","entries":[{"entry_id":"498","full_text":"fly"},{"entry_id":"233","full_text":"bug"}]}' -H "Content-Type: application/json" http://localhost:5003/titles/dn100/groups
+```
+
+
 ###Delete a group
 
 ```
