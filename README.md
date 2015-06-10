@@ -87,4 +87,10 @@ install requirements_test.txt and run
 source test.sh
 ```
 
+##Todo
+
+- Change service so that it updates working register - rather than add a new row.
+- Ensure that only one row exists for a title number / abr combo (see SoR for example).
+- Each amended entry needs to be flagged as such.
+
 
