@@ -49,6 +49,23 @@ def get_title():
 def index():
     return 'update-register running'
 
+# get whole working register
+@app.route('/titles/<title_number>', methods=["GET"])
+def get_whole_working_register(title_number):
+    title_json = get_title_from_working_register(title_number)
+
+    return json.dumps(title_json, sort_keys=True,
+                  indent=4, separators=(',', ': ')), 200
+
+# add whole working register
+@app.route('/titles', methods=["POST"])
+def add_whole_working_register():
+    title_json = request.get_json()
+
+    write_to_working_titles_database(title_json)
+
+    return "Title added", 200
+
 # This will start a new version of the register for amendment.  Right now it just adds test data to
 # the working register database
 @app.route('/start', methods=["POST"])
@@ -159,7 +176,6 @@ def get_title_from_working_register(title_number):
 
 #Updates the register with the amendment
 def update_title_on_working_register(title_json):
-    app.logger.info(title_json)
     write_to_working_titles_database(title_json)
     return 'updated'
 

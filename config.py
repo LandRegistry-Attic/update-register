@@ -5,7 +5,7 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     # format is dialect+driver://username:password@host:port/database
-    SQLALCHEMY_DATABASE_URI = 'postgresql://workingregister:workingregister@localhost/workingregister'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@localhost/workingregister'
     DEBUG = True
 
 class UnitTestConfig(Config):

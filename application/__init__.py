@@ -21,4 +21,4 @@ if not app.debug:
     # Enable log handlers
     app.logger.addHandler(console)
 
-app.config.from_object(os.environ.get('SETTINGS'))
+    app.config.from_object(os.environ.get('SETTINGS'))
