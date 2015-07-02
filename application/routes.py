@@ -3,6 +3,7 @@ from application import app
 from application import db
 import json
 import yaml
+import re
 from flask import request
 from sqlalchemy.sql import text
 
@@ -123,6 +124,10 @@ def delete_entry(title_number, group_position, entry_position):
     update_title_on_working_register(title_json)
     return 'Delete at group position %i, entry position %i' % (group_position, entry_position), 200
 
+# get the entry structure
+@app.route('/entrystructure', methods=["GET"])
+def get_entry_structure():
+    return json.dumps({"category": "","entry_date": "","entry_id": "","full_text": "","infills": [],"language":"","role_code": "","sequence_number":"","status":"","sub_register":"","template_text": ""})
 
 # insert a group
 @app.route('/titles/<title_number>/groups', methods=["PUT"])
@@ -132,6 +137,18 @@ def insert_group(title_number):
     # Insert to title_json with the payload (a group).  Use PyYAML to convert payload from unicode to ASCII.
     new_group_string = json.dumps(request.get_json())
     new_group_dict = yaml.safe_load(new_group_string)
+
+    entries = new_group_dict["entries"]
+
+    for entry in entries:
+        template_text = entry["template_text"]
+        full_text = re.sub('\*CP\*', get_text_for_infill("charge parties", entry["infills"]), template_text)
+        full_text = re.sub('\*CD\*', get_text_for_infill("charge date", entry["infills"]), full_text)
+        full_text = re.sub('\*O<>O\*', get_text_for_infill("optional", entry["infills"]), full_text)
+        #Remove double spaces because of empty option infills
+        full_text = re.sub('  ', ' ', full_text)
+        entry["full_text"] = full_text
+
     title_json["groups"].append(new_group_dict)
     group_position = len(title_json["groups"]) - 1
 
@@ -178,7 +195,6 @@ def get_title_from_working_register(title_number):
 #Updates the register with the amendment
 def update_title_on_working_register(title_json):
     # Gets the version of title number with the latest ID on the table
-    import pdb; pdb.set_trace()
     sql_text = text("UPDATE records SET record = '{0}' WHERE record ->> 'title_number' = '{1}';".format(json.dumps(title_json), title_json["title_number"]))
     result = db.engine.execute(sql_text)
 
@@ -194,3 +210,10 @@ def write_to_working_titles_database(title_json):
     except Exception:
         db.session.rollback()
         raise
+
+def get_text_for_infill(type, infills):
+    text = ""
+    for infill in infills:
+        if (infill["type"] == type) and ("text" in infill):
+            text = infill["text"]
+    return text
