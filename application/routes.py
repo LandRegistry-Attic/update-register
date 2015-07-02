@@ -4,6 +4,7 @@ from application import db
 import json
 import yaml
 from flask import request
+from sqlalchemy.sql import text
 
 
 def get_title():
@@ -176,7 +177,11 @@ def get_title_from_working_register(title_number):
 
 #Updates the register with the amendment
 def update_title_on_working_register(title_json):
-    write_to_working_titles_database(title_json)
+    # Gets the version of title number with the latest ID on the table
+    import pdb; pdb.set_trace()
+    sql_text = text("UPDATE records SET record = '{0}' WHERE record ->> 'title_number' = '{1}';".format(json.dumps(title_json), title_json["title_number"]))
+    result = db.engine.execute(sql_text)
+
     return 'updated'
 
 
