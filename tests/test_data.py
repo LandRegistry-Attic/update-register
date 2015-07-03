@@ -3,6 +3,7 @@ import json
 # This is the target of the unit tests.  Read only getter function, so that it can't be modified.
 def get_target_json():
     return {
+        "title_number" : "dn100",
         "groups": [
             {
                 "group_id": "12",
@@ -36,6 +37,7 @@ def get_target_json():
     }
 
 TITLE_WITH_AMENDED_ENTRY = {
+    "title_number" : "dn100",
     "groups": [
         {
             "group_id": "12",
@@ -69,6 +71,7 @@ TITLE_WITH_AMENDED_ENTRY = {
 }
 
 TITLE_WITH_INSERTED_ENTRY = {
+    "title_number" : "dn100",
     "groups": [
         {
             "group_id": "12",
@@ -106,6 +109,7 @@ TITLE_WITH_INSERTED_ENTRY = {
 }
 
 TITLE_WITH_DELETED_ENTRY = {
+    "title_number" : "dn100",
     "groups": [
         {
             "group_id": "12",
@@ -135,6 +139,7 @@ TITLE_WITH_DELETED_ENTRY = {
 }
 
 TITLE_WITH_INSERTED_EMPTY_GROUP = {
+    "title_number" : "dn100",
     "groups": [
         {
             "group_id": "12",
@@ -174,6 +179,7 @@ TITLE_WITH_INSERTED_EMPTY_GROUP = {
 }
 
 TITLE_WITH_DELETED_GROUP = {
+    "title_number" : "dn100",
     "groups": [
         {
             "group_id": "22",
@@ -193,6 +199,7 @@ TITLE_WITH_DELETED_GROUP = {
 }
 
 TITLE_WITH_REPLACED_GROUP = {
+    "title_number" : "dn100",
     "groups": [
         {
             "group_id": "76",

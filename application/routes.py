@@ -7,46 +7,6 @@ import re
 from flask import request
 from sqlalchemy.sql import text
 
-
-def get_title():
-    return {
-        "description": "test data",
-        "application_reference": "testabr",
-        "title_number": "tt12345",
-        "dlr": "a dlr",
-        "groups": [
-            {
-                "group_id": "1",
-                "category": "ABCD",
-                "entries": [
-                    {
-                        "entry_id": "998",
-                        "full_text": "foo"
-                    },
-                    {
-                        "entry_id": "999",
-                        "full_text": "bar"
-                    }
-                ]
-            },
-            {
-                "group_id": "2",
-                "category": "EFGH",
-                "entries": [
-                    {
-                        "entry_id": "999",
-                        "full_text": "cat"
-                    },
-                    {
-                        "entry_id": "998",
-                        "full_text": "mat"
-                    }
-                ]
-            }
-        ]
-    }
-
-
 @app.route('/health')
 def index():
     return 'update-register running'
@@ -63,35 +23,13 @@ def get_whole_working_register(title_number):
 @app.route('/titles', methods=["POST"])
 def add_whole_working_register():
     title_json = request.get_json()
-
-    # Gets the version of title number with the latest ID on the table
-    title_exists = False
-    sql_text = "SELECT 1 FROM records WHERE record ->> 'title_number' = '%s' order by id desc limit 1;" % title_json["title_number"]
-    result = db.engine.execute(sql_text)
-    for row in result:
-        title_exists = True
+    title_exists = check_title_exists(title_json["title_number"])
 
     if title_exists == True:
         return "Title already exists in DB", 200
     else:
         write_to_working_titles_database(title_json)
         return "Title added", 200
-
-# This will start a new version of the register for amendment.  Right now it just adds test data to
-# the working register database
-@app.route('/start', methods=["POST"])
-def start():
-    payload = request.get_json()
-    title_number = payload["title_number"]
-    application_reference = payload["application_reference"]
-
-    title_json = get_title()  # get data as hardcoded string for now
-    title_json["title_number"] = title_number  # re-assign payloads title number and abr
-    title_json["application_reference"] = application_reference
-
-
-    write_to_working_titles_database(title_json)
-    return 'started title number %s application reference %s' % (title_number, application_reference), 201
 
 
 # amend an individual entry
@@ -229,3 +167,12 @@ def get_text_for_infill(type, infills):
         if (infill["type"] == type) and ("text" in infill):
             text = infill["text"]
     return text
+
+def check_title_exists(title_number):
+    # Gets the version of title number with the latest ID on the table
+    title_exists = False
+    sql_text = "SELECT 1 FROM records WHERE record ->> 'title_number' = '%s' order by id desc limit 1;" % title_number
+    result = db.engine.execute(sql_text)
+    for row in result:
+        title_exists = True
+    return title_exists
