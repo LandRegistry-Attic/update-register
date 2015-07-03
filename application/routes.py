@@ -64,9 +64,18 @@ def get_whole_working_register(title_number):
 def add_whole_working_register():
     title_json = request.get_json()
 
-    write_to_working_titles_database(title_json)
+    # Gets the version of title number with the latest ID on the table
+    title_exists = False
+    sql_text = "SELECT 1 FROM records WHERE record ->> 'title_number' = '%s' order by id desc limit 1;" % title_json["title_number"]
+    result = db.engine.execute(sql_text)
+    for row in result:
+        title_exists = True
 
-    return "Title added", 200
+    if title_exists == True:
+        return "Title already exists in DB", 200
+    else:
+        write_to_working_titles_database(title_json)
+        return "Title added", 200
 
 # This will start a new version of the register for amendment.  Right now it just adds test data to
 # the working register database
@@ -134,26 +143,29 @@ def get_entry_structure():
 def insert_group(title_number):
     title_json = get_title_from_working_register(title_number)
 
-    # Insert to title_json with the payload (a group).  Use PyYAML to convert payload from unicode to ASCII.
-    new_group_string = json.dumps(request.get_json())
-    new_group_dict = yaml.safe_load(new_group_string)
+    if title_json:
+        # Insert to title_json with the payload (a group).  Use PyYAML to convert payload from unicode to ASCII.
+        new_group_string = json.dumps(request.get_json())
+        new_group_dict = yaml.safe_load(new_group_string)
 
-    entries = new_group_dict["entries"]
+        entries = new_group_dict["entries"]
 
-    for entry in entries:
-        template_text = entry["template_text"]
-        full_text = re.sub('\*CP\*', get_text_for_infill("charge parties", entry["infills"]), template_text)
-        full_text = re.sub('\*CD\*', get_text_for_infill("charge date", entry["infills"]), full_text)
-        full_text = re.sub('\*O<>O\*', get_text_for_infill("optional", entry["infills"]), full_text)
-        #Remove double spaces because of empty option infills
-        full_text = re.sub('  ', ' ', full_text)
-        entry["full_text"] = full_text
+        for entry in entries:
+            template_text = entry["template_text"]
+            full_text = re.sub('\*CP\*', get_text_for_infill("charge parties", entry["infills"]), template_text)
+            full_text = re.sub('\*CD\*', get_text_for_infill("charge date", entry["infills"]), full_text)
+            full_text = re.sub('\*O<>O\*', get_text_for_infill("optional", entry["infills"]), full_text)
+            #Remove double spaces because of empty option infills
+            full_text = re.sub('  ', ' ', full_text)
+            entry["full_text"] = full_text
 
-    title_json["groups"].append(new_group_dict)
-    group_position = len(title_json["groups"]) - 1
+        title_json["groups"].append(new_group_dict)
+        group_position = len(title_json["groups"]) - 1
 
-    update_title_on_working_register(title_json)
-    return 'Insert made at group position %i' % group_position, 201
+        update_title_on_working_register(title_json)
+        return 'Insert made at group position %i' % group_position, 201
+    else:
+        return 'No title found for {0}'.format(title_number), 500
 
 
 # delete a group
