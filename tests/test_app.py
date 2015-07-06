@@ -56,8 +56,18 @@ class TestCaseListView(unittest.TestCase):
     @mock.patch('application.routes.check_title_exists')
     def test_add_title(self, mock_check, mock_write):
         mock_check.return_value = False
+        mock_write.return_value = None
         headers = {"Content-Type": "application/json"}
-        response = self.app.post('/titles', data={"title_number":"DN100"}, headers=headers)
+        response = self.app.post('/titles', data=json.dumps({"title_number":"DN100"}), headers=headers)
+        assert response.status_code == 200
+
+    @mock.patch('application.routes.write_to_working_titles_database')
+    @mock.patch('application.routes.check_title_exists')
+    def test_add_title_already_exists(self, mock_check, mock_write):
+        mock_check.return_value = True
+        mock_write.return_value = None
+        headers = {"Content-Type": "application/json"}
+        response = self.app.post('/titles', data=json.dumps({"title_number":"DN100"}), headers=headers)
         assert response.status_code == 200
 
     @mock.patch('application.routes.get_title_from_working_register')
