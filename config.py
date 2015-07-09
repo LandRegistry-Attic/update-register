@@ -13,8 +13,8 @@ class UnitTestConfig(Config):
     SQLALCHEMY_DATABASE_URI = ''
     DEBUG = True
 
-class PreviewConfig(Config):
-    SQLALCHEMY_DATABASE_URI = ''
+class TestConfig(Config):
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', '')
     DEBUG = True
 
 class PreproductionConfig(Config):
