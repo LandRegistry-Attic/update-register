@@ -1,6 +1,7 @@
 import os
 
 class Config(object):
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@localhost/workingregister'
     DEBUG = False
 
 class DevelopmentConfig(Config):
@@ -12,7 +13,7 @@ class DevelopmentConfig(Config):
 class UnitTestConfig(Config):
     #Class needed so no messages not actually published by tests.
     CURRENT_REGISTER_API = "http://localhost:5007"
-    SQLALCHEMY_DATABASE_URI = ''
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@localhost/workingregister'
     DEBUG = True
 
 class TestConfig(Config):

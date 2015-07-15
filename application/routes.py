@@ -142,8 +142,7 @@ def get_title_from_working_register(title_number):
         for row in result:
             title = row['record']
     else:
-        title = requests.get(app.config['CURRENT_REGISTER_API']+'/register/'+title_number)
-        print(title)
+        title = requests.get(app.config['CURRENT_REGISTER_API']+'/register/'+title_number).json()
         write_to_working_titles_database(title)
 
     return title
@@ -178,8 +177,9 @@ def get_text_for_infill(type, infills):
 def check_title_exists(title_number):
     # Gets the version of title number with the latest ID on the table
     title_exists = False
-    sql_text = "SELECT 1 FROM records WHERE record ->> 'title_number' = '%s' order by id desc limit 1;" % title_number
+    sql_text = "SELECT 1 FROM records WHERE record ->> 'title_number' = '%s' order by id desc limit 1" % title_number
     result = db.engine.execute(sql_text)
+
     for row in result:
         title_exists = True
     return title_exists
