@@ -1,19 +1,23 @@
 import os
 
 class Config(object):
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@localhost/workingregister'
     DEBUG = False
 
 class DevelopmentConfig(Config):
     # format is dialect+driver://username:password@host:port/database
+    CURRENT_REGISTER_API = "http://localhost:5007"
     SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@localhost/workingregister'
     DEBUG = True
 
 class UnitTestConfig(Config):
     #Class needed so no messages not actually published by tests.
-    SQLALCHEMY_DATABASE_URI = ''
+    CURRENT_REGISTER_API = "http://localhost:5007"
+    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@localhost/workingregister'
     DEBUG = True
 
 class TestConfig(Config):
+    CURRENT_REGISTER_API = "http://localhost:5007"
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', '')
     DEBUG = True
 
