@@ -1,19 +1,31 @@
 import unittest
 import json
 import mock
+import responses
 
-from application import app
+from application import app, db
+from application.models import WorkingTitles
 from test_data import TITLE_WITH_AMENDED_ENTRY, ENTRY_AMENDMENT, ENTRY_INSERT, TITLE_WITH_INSERTED_ENTRY
 from test_data import TITLE_WITH_DELETED_ENTRY, get_target_json, GROUP_INSERT, TITLE_WITH_DELETED_GROUP
-from test_data import TITLE_WITH_INSERTED_EMPTY_GROUP, TITLE_WITH_REPLACED_GROUP, GROUP_REPLACE
+from test_data import TITLE_WITH_INSERTED_EMPTY_GROUP, TITLE_WITH_REPLACED_GROUP, GROUP_REPLACE, TEST_REGISTER, TEST_REGISTER2
 
 class TestCaseListView(unittest.TestCase):
 
     mock_title = {}
 
     def setUp(self):
+        app.config["TESTING"] = True
         self.app = app.test_client()
         self.mock_title.clear()
+        db.create_all()
+        register = self.get_register_model()
+        db.session.add(register)
+        db.session.commit()
+        # self.insert_mock_title_onto_db
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
 
     def test_service_health(self):
         response = self.app.get('/health')
@@ -109,13 +121,36 @@ class TestCaseListView(unittest.TestCase):
         self.assertEqual('Group amended at group position 0', response.data.decode("utf-8"))
         self.assertEqual(self.mock_title, TITLE_WITH_REPLACED_GROUP)
 
+    def test_get_working_register(self):
+        response = self.app.get('titles/AV239038')
+        assert response.status_code == 200
+
+    @responses.activate
+    def test_get_no_result_from_working_register(self):
+
+        url = app.config['CURRENT_REGISTER_API']+'/register/AV239040'
+        responses.add(responses.GET, url,
+                      body=json.dumps(TEST_REGISTER2),
+                      status=200, content_type='application/json')
+        response = self.app.get('titles/AV239040')
+
+        assert response.status_code == 200
+
+    def insert_mock_title_onto_db(self):
+        self.app.post('/titles',data=json.dumps(TEST_REGISTER),
+                                headers={'content-type': 'application/json'})
 
     def mock_update_title_on_working_register(self, title_json):
         self.mock_title = title_json
         return 'updated'
+
+    def get_register_model(self):
+        workingTitle = WorkingTitles(TEST_REGISTER)
+        return workingTitle
 
     def mock_get_title_from_working_register(self, title_number):
         return get_target_json()
 
     def do_nothing(self, *args):
         pass
+
