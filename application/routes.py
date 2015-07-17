@@ -17,8 +17,11 @@ def index():
 def get_whole_working_register(title_number):
     title_json = get_title_from_working_register(title_number)
 
-    return json.dumps(title_json, sort_keys=True,
-                  indent=4, separators=(',', ': ')), 200
+    if title_json is not None:
+        return json.dumps(title_json, sort_keys=True,
+                      indent=4, separators=(',', ': ')), 200
+    else:
+        return "title not found", 404
 
 # add whole working register
 @app.route('/titles', methods=["POST"])
@@ -142,8 +145,10 @@ def get_title_from_working_register(title_number):
         for row in result:
             title = row['record']
     else:
-        title = requests.get(app.config['CURRENT_REGISTER_API']+'/register/'+title_number).json()
-        write_to_working_titles_database(title)
+        response = requests.get(app.config['CURRENT_REGISTER_API']+'/register/'+title_number)
+        if response.status_code == 200:
+            title = response.json()
+            write_to_working_titles_database(title)
 
     return title
 
