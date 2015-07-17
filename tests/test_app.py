@@ -17,11 +17,7 @@ class TestCaseListView(unittest.TestCase):
         app.config["TESTING"] = True
         self.app = app.test_client()
         self.mock_title.clear()
-        db.create_all()
-        register = self.get_register_model()
-        db.session.add(register)
-        db.session.commit()
-        # self.insert_mock_title_onto_db
+
 
     def tearDown(self):
         db.session.remove()
@@ -121,20 +117,28 @@ class TestCaseListView(unittest.TestCase):
         self.assertEqual('Group amended at group position 0', response.data.decode("utf-8"))
         self.assertEqual(self.mock_title, TITLE_WITH_REPLACED_GROUP)
 
-    def test_get_working_register(self):
-        response = self.app.get('titles/AV239038')
-        assert response.status_code == 200
+    # @mock.patch('application.db.engine.connect')
+    # def test_get_working_register(self, mock_connection):
+    #     db_execute_mock = mock.Mock()
+    #     mock_connection.return_value = db_execute_mock
+    #     #mock_commit.side_effect = self.mock_update_title_on_working_register(TEST_REGISTER)
+    #     response = self.app.get('titles/AV239038')
+    #     assert response.status_code == 200
+    #
+    # @responses.activate
+    # def test_get_no_result_from_working_register(self):
+    #
+    #     url = app.config['CURRENT_REGISTER_API']+'/register/AV239040'
+    #     responses.add(responses.GET, url,
+    #                   body=json.dumps(TEST_REGISTER2),
+    #                   status=200, content_type='application/json')
+    #     response = self.app.get('titles/AV239040')
+    #
+    #     assert response.status_code == 200
 
-    @responses.activate
-    def test_get_no_result_from_working_register(self):
-
-        url = app.config['CURRENT_REGISTER_API']+'/register/AV239040'
-        responses.add(responses.GET, url,
-                      body=json.dumps(TEST_REGISTER2),
-                      status=200, content_type='application/json')
-        response = self.app.get('titles/AV239040')
-
-        assert response.status_code == 200
+    def test_register_model(self):
+        workingTitle = WorkingTitles(TEST_REGISTER)
+        return workingTitle
 
     def insert_mock_title_onto_db(self):
         self.app.post('/titles',data=json.dumps(TEST_REGISTER),
@@ -143,10 +147,6 @@ class TestCaseListView(unittest.TestCase):
     def mock_update_title_on_working_register(self, title_json):
         self.mock_title = title_json
         return 'updated'
-
-    def get_register_model(self):
-        workingTitle = WorkingTitles(TEST_REGISTER)
-        return workingTitle
 
     def mock_get_title_from_working_register(self, title_number):
         return get_target_json()
