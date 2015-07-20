@@ -3,7 +3,7 @@ import json
 import mock
 import responses
 
-from application import app, db
+from application import app
 from application.models import WorkingTitles
 from test_data import TITLE_WITH_AMENDED_ENTRY, ENTRY_AMENDMENT, ENTRY_INSERT, TITLE_WITH_INSERTED_ENTRY
 from test_data import TITLE_WITH_DELETED_ENTRY, get_target_json, GROUP_INSERT, TITLE_WITH_DELETED_GROUP
@@ -18,10 +18,6 @@ class TestCaseListView(unittest.TestCase):
         self.app = app.test_client()
         self.mock_title.clear()
 
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
 
     def test_service_health(self):
         response = self.app.get('/health')
