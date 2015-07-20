@@ -144,7 +144,7 @@ class TestCaseListView(unittest.TestCase):
         self.mock_title = title_json
         return 'updated'
 
-    def mock_get_title_from_working_register(self, title_number):
+    def mock_get_title_from_working_register(self, title_number, register_format=None):
         return get_target_json()
 
     def do_nothing(self, *args):
