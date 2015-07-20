@@ -7,6 +7,7 @@ import re
 import requests
 from flask import request
 from sqlalchemy.sql import text
+from .utils import convert_register_format
 
 @app.route('/health')
 def index():
@@ -15,7 +16,8 @@ def index():
 # get whole working register
 @app.route('/titles/<title_number>', methods=["GET"])
 def get_whole_working_register(title_number):
-    title_json = get_title_from_working_register(title_number)
+    register_format = request.args.get("format")
+    title_json = get_title_from_working_register(title_number, register_format)
 
     if title_json is not None:
         return json.dumps(title_json, sort_keys=True,
@@ -136,7 +138,7 @@ def amend_group(title_number, group_position):
 
 
 #gets the title from the working register.
-def get_title_from_working_register(title_number):
+def get_title_from_working_register(title_number, register_format=None):
     # Gets the version of title number with the latest ID on the table
     title = None
     if check_title_exists(title_number):
@@ -144,6 +146,8 @@ def get_title_from_working_register(title_number):
         result = db.engine.execute(sql_text)
         for row in result:
             title = row['record']
+        if register_format:
+            title = convert_register_format(title, register_format)
     else:
         response = requests.get(app.config['CURRENT_REGISTER_API']+'/register/'+title_number)
         if response.status_code == 200:
