@@ -182,9 +182,13 @@ def get_text_for_infill(type, infills):
 def check_title_exists(title_number):
     # Gets the version of title number with the latest ID on the table
     title_exists = False
-    sql_text = "SELECT 1 FROM records WHERE record ->> 'title_number' = '%s' order by id desc limit 1" % title_number
-    result = db.engine.execute(sql_text)
 
+    sql_text = "SELECT 1 FROM records WHERE coalesce( case when (record ->> 'title_number') is NULL then null " \
+               "else (record ->> 'title_number' = '%s'" % title_number + ") " \
+               "end) " \
+               "order by id desc limit 1"
+
+    result = db.engine.execute(sql_text)
     for row in result:
         title_exists = True
     return title_exists
