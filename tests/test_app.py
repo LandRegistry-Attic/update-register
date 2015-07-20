@@ -113,24 +113,6 @@ class TestCaseListView(unittest.TestCase):
         self.assertEqual('Group amended at group position 0', response.data.decode("utf-8"))
         self.assertEqual(self.mock_title, TITLE_WITH_REPLACED_GROUP)
 
-    # @mock.patch('application.db.engine.connect')
-    # def test_get_working_register(self, mock_connection):
-    #     db_execute_mock = mock.Mock()
-    #     mock_connection.return_value = db_execute_mock
-    #     #mock_commit.side_effect = self.mock_update_title_on_working_register(TEST_REGISTER)
-    #     response = self.app.get('titles/AV239038')
-    #     assert response.status_code == 200
-    #
-    # @responses.activate
-    # def test_get_no_result_from_working_register(self):
-    #
-    #     url = app.config['CURRENT_REGISTER_API']+'/register/AV239040'
-    #     responses.add(responses.GET, url,
-    #                   body=json.dumps(TEST_REGISTER2),
-    #                   status=200, content_type='application/json')
-    #     response = self.app.get('titles/AV239040')
-    #
-    #     assert response.status_code == 200
 
     def test_register_model(self):
         workingTitle = WorkingTitles(TEST_REGISTER)
