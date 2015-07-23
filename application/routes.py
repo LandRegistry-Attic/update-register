@@ -147,14 +147,14 @@ def get_title_from_working_register(title_number, register_format=None):
         for row in result:
             title = row['record']
     else:
-        response = requests.get(app.config['CURRENT_REGISTER_API']+'/register/'+title_number)
+        response = requests.get(app.config['CURRENT_REGISTER_API']+'/register/'+title_number, headers={"Content-Type":"application/json"})
         if response.status_code == 200:
             title = response.json()
             write_to_working_titles_database(title)
 
     if register_format:
         title = convert_register_format(title, register_format)
-    
+
     return title
 
 
