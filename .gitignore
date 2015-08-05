@@ -24,3 +24,5 @@ acceptance_tests/*.png
 #intellij
 *.iml
 *.idea
+
+.venv
