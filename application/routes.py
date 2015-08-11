@@ -111,6 +111,10 @@ def insert_group(title_number):
     else:
         return 'No title found for {0}'.format(title_number), 500
 
+#get something to complete
+@app.route('/complete/<case_number>')
+def complete(case_number):
+    return 'hit Update Register complete function with case number ' + case_number
 
 # delete a group
 @app.route('/titles/<title_number>/groups/<int:group_position>', methods=["DELETE"])
