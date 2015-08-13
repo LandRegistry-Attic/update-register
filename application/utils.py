@@ -28,5 +28,6 @@ def add_entry_to_sub_register(sub_register, entry_to_add):
             if entry_to_add["sequence_number"] < entry["sequence_number"]:
                 sub_register["entries"].insert(idx, entry_to_add)
                 entry_added = True
+                break
         if not entry_added:
             sub_register["entries"].append(entry_to_add)
