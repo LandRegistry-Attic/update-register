@@ -23,6 +23,13 @@ class TestCaseListView(unittest.TestCase):
         response = self.app.get('/health')
         assert response.status_code == 200
 
+    def test_complete(self):
+        headers = {'content-Type': 'application/json'}
+        response = self.app.put('/complete/GOODCASE001', data=GROUP_INSERT, headers=headers)
+        assert response.status_code == 200
+        self.assertEqual('bloop', response.data.decode("utf-8"))
+
+
     @mock.patch('application.routes.get_title_from_working_register')
     @mock.patch('application.routes.update_title_on_working_register')
     def test_amend_entry(self, mock_update, mock_get):
@@ -149,4 +156,3 @@ class TestCaseListView(unittest.TestCase):
 
     def do_nothing(self, *args):
         pass
-
