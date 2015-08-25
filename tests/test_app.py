@@ -2,6 +2,7 @@ import unittest
 import json
 import mock
 import responses
+from flask import Response
 
 from application import app
 from application.models import WorkingTitles
@@ -21,6 +22,14 @@ class TestCaseListView(unittest.TestCase):
 
     def test_service_health(self):
         response = self.app.get('/health')
+        assert response.status_code == 200
+
+    @mock.patch('requests.get')
+    def test_complete(self, mock_get):
+        case_number = 'GOODCASE001'
+        mock_get.return_value = Response("Good case", 200)
+        headers = {'content-Type': 'application/json'}
+        response = self.app.get('/complete/%s' % case_number, headers=headers)
         assert response.status_code == 200
 
     @mock.patch('application.routes.get_title_from_working_register')
@@ -147,6 +156,8 @@ class TestCaseListView(unittest.TestCase):
     def mock_get_title_from_working_register(self, title_number, register_format=None):
         return get_target_json()
 
+    def mock_complete_application(self):
+        return 'ok'
+
     def do_nothing(self, *args):
         pass
-
