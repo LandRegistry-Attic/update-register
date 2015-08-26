@@ -24,10 +24,10 @@ class TestCaseListView(unittest.TestCase):
         response = self.app.get('/health')
         assert response.status_code == 200
 
-    @mock.patch('requests.get')
-    def test_complete(self, mock_get):
+    @mock.patch('requests.post')
+    def test_complete(self, mock_post):
         case_number = 'GOODCASE001'
-        mock_get.return_value = Response("Good case", 200)
+        mock_post.side_effect = self.mock_complete_application
         headers = {'content-Type': 'application/json'}
         response = self.app.get('/complete/%s' % case_number, headers=headers)
         assert response.status_code == 200
@@ -156,8 +156,8 @@ class TestCaseListView(unittest.TestCase):
     def mock_get_title_from_working_register(self, title_number, register_format=None):
         return get_target_json()
 
-    def mock_complete_application(self):
-        return 'ok'
+    def mock_complete_application(self, *args):
+        return Response("complete success", 200)
 
     def do_nothing(self, *args):
         pass

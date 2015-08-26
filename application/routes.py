@@ -5,7 +5,7 @@ import json
 import yaml
 import re
 import requests
-from flask import request
+from flask import request, Response
 from sqlalchemy.sql import text
 from .utils import convert_register_format
 
@@ -114,9 +114,9 @@ def insert_group(title_number):
 #get something to complete
 @app.route('/complete/<case_number>', methods=["GET"])
 def complete(case_number):
-    response = requests.get("http://localhost:8888/RegisterAdapter/complete/" + case_number)
-    #response = 'hello'
-    return response
+    response = requests.post("http://localhost:8888/RegisterAdapter/complete/" + case_number)
+
+    return Response("Complete successful", 200)
 
 # delete a group
 @app.route('/titles/<title_number>/groups/<int:group_position>', methods=["DELETE"])
