@@ -14,6 +14,7 @@ class UnitTestConfig(Config):
 
 class TestConfig(Config):
     DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'postgresql://workingregister:workingregister@localhost/workingregister')
 
 class PreproductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = ''
