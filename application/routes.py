@@ -112,9 +112,10 @@ def insert_group(title_number):
         return 'No title found for {0}'.format(title_number), 500
 
 #get something to complete
-@app.route('/complete/<case_number>', methods=["GET"])
-def complete(case_number):
-    response = requests.post("http://localhost:8888/RegisterAdapter/complete/" + case_number)
+@app.route('/complete', methods=["POST"])
+def complete():
+    req_json = request.get_json()
+    response = requests.post("http://localhost:8888/RegisterAdapter/complete", data=req_json)
 
     return Response("Complete successful", 200)
 
