@@ -420,6 +420,12 @@ GROUP_INSERT = json.dumps({
     "entries": []
 })
 
+TEST_COMPLETE = json.dumps({
+    "title_number": "DN93232",
+    "application_ref": "H0l333"
+}
+
+)
 GROUP_REPLACE = json.dumps({
     "group_id": "76",
     "category": "ZVCF",

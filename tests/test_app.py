@@ -8,7 +8,7 @@ from application import app
 from application.models import WorkingTitles
 from test_data import TITLE_WITH_AMENDED_ENTRY, ENTRY_AMENDMENT, ENTRY_INSERT, TITLE_WITH_INSERTED_ENTRY
 from test_data import TITLE_WITH_DELETED_ENTRY, get_target_json, GROUP_INSERT, TITLE_WITH_DELETED_GROUP
-from test_data import TITLE_WITH_INSERTED_EMPTY_GROUP, TITLE_WITH_REPLACED_GROUP, GROUP_REPLACE, TEST_REGISTER, TEST_REGISTER2
+from test_data import TITLE_WITH_INSERTED_EMPTY_GROUP, TITLE_WITH_REPLACED_GROUP, GROUP_REPLACE, TEST_REGISTER, TEST_REGISTER2, TEST_COMPLETE
 
 class TestCaseListView(unittest.TestCase):
 
@@ -28,8 +28,8 @@ class TestCaseListView(unittest.TestCase):
     def test_complete(self, mock_post):
         case_number = 'GOODCASE001'
         mock_post.side_effect = self.mock_complete_application
-        headers = {'content-Type': 'application/json'}
-        response = self.app.get('/complete/%s' % case_number, headers=headers)
+
+        response = self.app.post('/complete', data=TEST_COMPLETE)
         assert response.status_code == 200
 
     @mock.patch('application.routes.get_title_from_working_register')
@@ -156,7 +156,7 @@ class TestCaseListView(unittest.TestCase):
     def mock_get_title_from_working_register(self, title_number, register_format=None):
         return get_target_json()
 
-    def mock_complete_application(self, *args):
+    def mock_complete_application(self, url, data):
         return Response("complete success", 200)
 
     def do_nothing(self, *args):
