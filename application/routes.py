@@ -115,7 +115,10 @@ def insert_group(title_number):
 @app.route('/complete', methods=["POST"])
 def complete():
     req_json = request.get_json()
-    response = requests.post("http://localhost:8888/RegisterAdapter/complete", data=req_json)
+    title_json = get_title_from_working_register(req_json["title_number"])
+    new_req_json = '{"title_number": "%s", "application_ref": "%s", "charge_amount" : "%s", "register_details" : "%s"}' \
+                   % (req_json["title_number"], req_json["application_ref"], req_json["charge_amount"], title_json)
+    response = requests.post("http://localhost:8888/RegisterAdapter/complete", data=new_req_json)
 
     return Response("Complete successful", 200)
 
