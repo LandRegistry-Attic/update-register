@@ -116,13 +116,15 @@ def insert_group(title_number):
 def complete():
     header = {"Content-Type":"application/json"}
 
-    req_json = json.dumps(request.get_json())
+    req_json = request.get_json()
+    working_register =  get_title_from_working_register(req_json['title_number'])
+    req_json['register_details'] = working_register
+    data = json.dumps(req_json)
 
-    response = requests.post("http://localhost:8888/RegisterAdapter/complete", data=req_json, headers=header)
-    if response.status_code != 200:
-        return "balls"
-    else:
-        return Response("Complete successful", 200)
+    response = requests.post("http://localhost:8888/RegisterAdapter/complete", data=data , headers=header)
+
+    return json.dumps(response.json())
+
 
 # delete a group
 @app.route('/titles/<title_number>/groups/<int:group_position>', methods=["DELETE"])
