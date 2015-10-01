@@ -122,7 +122,7 @@ def complete():
     data = json.dumps(req_json)
 
     response = requests.post("http://localhost:8888/RegisterAdapter/complete", data=data , headers=header)
-
+    response.raise_for_status()
     return json.dumps(response.json())
 
 
