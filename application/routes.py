@@ -115,9 +115,8 @@ def insert_group(title_number):
 @app.route('/complete', methods=["POST"])
 def complete():
     header = {"Content-Type":"application/json"}
-
-    req_json = request.get_json()
-    working_register =  get_title_from_working_register(req_json['title_number'])
+    req_json = json.loads(request.get_json())
+    working_register =  get_title_from_working_register(str(req_json['title_number']))
     req_json['register_details'] = working_register
     data = json.dumps(req_json)
 
