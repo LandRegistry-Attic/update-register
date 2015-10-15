@@ -114,10 +114,16 @@ def insert_group(title_number):
 #get something to complete
 @app.route('/complete', methods=["POST"])
 def complete():
-    req_json = request.get_json()
-    response = requests.post("http://localhost:8888/RegisterAdapter/complete", data=req_json)
+    header = {"Content-Type":"application/json"}
+    req_json = json.loads(request.get_json())
+    working_register =  get_title_from_working_register(str(req_json['title_number']))
+    req_json['register_details'] = working_register
+    data = json.dumps(req_json)
 
-    return Response("Complete successful", 200)
+    response = requests.post("http://localhost:8888/RegisterAdapter/complete", data=data , headers=header)
+    response.raise_for_status()
+    return json.dumps(response.json())
+
 
 # delete a group
 @app.route('/titles/<title_number>/groups/<int:group_position>', methods=["DELETE"])
@@ -148,6 +154,7 @@ def amend_group(title_number, group_position):
 def get_title_from_working_register(title_number, register_format=None):
     # Gets the version of title number with the latest ID on the table
     title = None
+
     if check_title_exists(title_number):
         sql_text = "SELECT * FROM records WHERE record ->> 'title_number' = '%s' order by id desc limit 1;" % title_number
         result = db.engine.execute(sql_text)
