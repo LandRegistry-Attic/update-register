@@ -121,6 +121,9 @@ def complete():
     data = json.dumps(req_json)
 
     response = requests.post("http://localhost:8888/RegisterAdapter/complete", data=data , headers=header)
+    if response.status_code == requests.codes.ok:
+        delete_title_on_working_register(str(req_json['title_number']))
+
     response.raise_for_status()
     return json.dumps(response.json())
 
@@ -179,6 +182,13 @@ def update_title_on_working_register(title_json):
     result = db.engine.execute(sql_text)
 
     return 'updated'
+
+#Deletes the title register
+def delete_title_on_working_register(title_no):
+    sql_text = text("DELETE FROM records WHERE record ->> 'title_number' = '{0}';".format(title_no)
+    result = db.engine.execute(sql_text)
+
+    return 'deleted'
 
 
 def write_to_working_titles_database(title_json):
