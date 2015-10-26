@@ -185,7 +185,7 @@ def update_title_on_working_register(title_json):
 
 #Deletes the title register
 def delete_title_on_working_register(title_no):
-    sql_text = text("DELETE FROM records WHERE record ->> 'title_number' = '{0}';".format(title_no)
+    sql_text = text("DELETE FROM records WHERE record ->> 'title_number' = '{0}';".format(title_no))
     result = db.engine.execute(sql_text)
 
     return 'deleted'
